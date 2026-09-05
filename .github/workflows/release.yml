@@ -1,0 +1,71 @@
+name: Build signed Android release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  android-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      EXPECTED_CERT_SHA256: 1fb452ea51145153898bad1299ea8f828d73a234192af6cf1fae09d79a6dfb9c
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v5
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install Android build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends android-sdk-build-tools android-sdk-platform-23 dalvik-exchange
+      - name: Restore protected signing key
+        env:
+          ANDROID_SIGNING_KEY_BASE64: ${{ secrets.ANDROID_SIGNING_KEY_BASE64 }}
+        run: |
+          test -n "$ANDROID_SIGNING_KEY_BASE64"
+          printf '%s' "$ANDROID_SIGNING_KEY_BASE64" | base64 --decode > gmdeck-release.jks
+          chmod 600 gmdeck-release.jks
+      - name: Validate release contract
+        run: npm run test:release
+      - name: Build signed APK
+        run: bash build.sh
+      - name: Verify package and signer
+        run: |
+          aapt dump badging TTRPG-Control-Deck.apk | grep -F "versionName='$(node -p "require('./package.json').version")'"
+          apksigner verify --verbose --print-certs TTRPG-Control-Deck.apk
+          apksigner verify --print-certs TTRPG-Control-Deck.apk | grep -F "Signer #1 certificate SHA-256 digest: $EXPECTED_CERT_SHA256"
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            test "$GITHUB_REF_NAME" = "v$(node -p "require('./package.json').version")"
+          fi
+          sha256sum TTRPG-Control-Deck.apk > TTRPG-Control-Deck.apk.sha256
+      - name: Upload manual-build artifact
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ttrpg-control-deck-${{ github.sha }}
+          path: |
+            TTRPG-Control-Deck.apk
+            TTRPG-Control-Deck.apk.sha256
+          if-no-files-found: error
+      - name: Publish GitHub release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          gh release create "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "TTRPG Control Deck $version" \
+            --notes-file "docs/RELEASE-NOTES-$version.md" \
+            TTRPG-Control-Deck.apk \
+            TTRPG-Control-Deck.apk.sha256

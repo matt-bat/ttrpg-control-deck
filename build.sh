@@ -4,7 +4,10 @@ set -euo pipefail
 app_root="$(cd "$(dirname "$0")" && pwd)"
 build_dir="$app_root/build"
 android_jar="/usr/lib/android-sdk/platforms/android-23/android.jar"
-key_store="$app_root/gmdeck-release.jks"
+key_store="${GMDECK_KEYSTORE:-$app_root/gmdeck-release.jks}"
+key_alias="${GMDECK_KEY_ALIAS:-gmdeck}"
+store_password="${GMDECK_STORE_PASSWORD:-gmdeck-local-key}"
+key_password="${GMDECK_KEY_PASSWORD:-$store_password}"
 
 mkdir -p "$build_dir/classes"
 find "$build_dir/classes" -type f -delete
@@ -23,11 +26,12 @@ aapt add gmdeck-unsigned.apk classes.dex
 zipalign -f 4 gmdeck-unsigned.apk gmdeck-aligned.apk
 
 if [[ ! -f "$key_store" ]]; then
-  keytool -genkeypair -noprompt -keystore "$key_store" -storepass gmdeck-local-key \
-    -keypass gmdeck-local-key -alias gmdeck -keyalg RSA -keysize 2048 \
+  keytool -genkeypair -noprompt -keystore "$key_store" -storepass "$store_password" \
+    -keypass "$key_password" -alias "$key_alias" -keyalg RSA -keysize 2048 \
     -validity 9125 -dname "CN=Local TTRPG Control Deck, OU=Tabletop, O=Local, C=CA"
 fi
 
-apksigner sign --ks "$key_store" --ks-pass pass:gmdeck-local-key \
-  --key-pass pass:gmdeck-local-key --out "$app_root/TTRPG-Control-Deck.apk" gmdeck-aligned.apk
+apksigner sign --ks "$key_store" --ks-pass "pass:$store_password" \
+  --key-pass "pass:$key_password" --ks-key-alias "$key_alias" \
+  --out "$app_root/TTRPG-Control-Deck.apk" gmdeck-aligned.apk
 apksigner verify --verbose --print-certs "$app_root/TTRPG-Control-Deck.apk"

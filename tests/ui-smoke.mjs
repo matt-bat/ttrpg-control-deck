@@ -19,6 +19,7 @@ page.on('pageerror', error => errors.push(error.message));
 await page.goto(pathToFileURL(path.join(root, 'assets', 'index.html')).href);
 await page.evaluate(() => localStorage.clear());
 await page.reload();
+await page.evaluate(() => { Math.random = () => 0.5; });
 
 const check = (condition, message) => {
   if (!condition) throw new Error(message);

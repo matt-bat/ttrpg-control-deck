@@ -4,6 +4,10 @@ All notable changes to TTRPG Control Deck are recorded here.
 
 ## Unreleased
 
+No unreleased changes.
+
+## 3.1.1 — 2026-09-05
+
 - Renamed the public product, repository, APK, screenshots, and setup package from GM Deck to TTRPG Control Deck.
 - Preserved the existing Android package, deep-link scheme, storage keys, and backup format for compatibility.
 - Refreshed tool views when navigating and isolated dice and saved-library state by campaign.

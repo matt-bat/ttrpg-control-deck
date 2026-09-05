@@ -19,11 +19,13 @@ An offline-first tabletop companion that turns a small Android display into a fo
 |:---:|:---:|
 | ![TTRPG Control Deck DM and Player role switcher](screenshots/ttrpg-control-deck-3.1-role-switcher.png) | ![TTRPG Control Deck Scene Director presets](screenshots/ttrpg-control-deck-3.1-scene-director.png) |
 
-[Open the live browser demo](https://matt-bat.github.io/ttrpg-control-deck/) to try the touch interface without installing an APK. Dice, initiative, campaign profiles, character tools, and session state work in the browser and remain in that browser's local storage. Android launch shortcuts and native background ambience require the installed Android application.
+[Download the current Android APK](https://github.com/matt-bat/ttrpg-control-deck/releases/latest/download/TTRPG-Control-Deck.apk) or [open the live browser demo](https://matt-bat.github.io/ttrpg-control-deck/). The browser demo keeps its state in that browser; Android launch shortcuts and native background ambience require the installed application.
+
+For device requirements, checksum verification, first installation, upgrades, troubleshooting, Home-button recovery, and removal, follow the [Android installation guide](docs/INSTALL.md).
 
 ## What it does
 
-TTRPG Control Deck 3.1.0 is designed around the 960×480 Echo Show 5 viewport while remaining usable in a normal Android WebView. Its major features are:
+TTRPG Control Deck 3.1.1 is designed around the 960×480 Echo Show 5 viewport while remaining usable in a normal Android WebView. Its major features are:
 
 - Runs as a regular Android app, so the device Home button returns to the tablet launcher.
 - DM and Player interfaces switchable in two taps.
@@ -44,7 +46,7 @@ TTRPG Control Deck is not an official Foundry, Roll20, Amazon, Wizards of the Co
 
 This repository contains the custom TTRPG Control Deck application. It does not root, unlock, or install a replacement operating system on an Echo Show. Device conversion and APK installation are separate operations whose availability and risk depend on the exact hardware and Fire OS release.
 
-Version 3.1.0 has automated browser-visible validation at 960×480 and a successfully built/signed APK. It has not yet been physically validated on the target Alexa device because that device was unavailable during final testing.
+Version 3.1.1 has automated browser-visible validation at 960×480 and has been built, installed, launched, and Home-button tested on an Echo Show 5 running an Android/LineageOS environment. Stock-device conversion remains outside this project's scope.
 
 ## Quick start for contributors
 
@@ -69,17 +71,20 @@ Build the Android APK on a compatible Debian/Ubuntu Android SDK environment:
 bash build.sh
 ```
 
-The build produces `TTRPG-Control-Deck.apk` locally. On its first run, the script creates a project-local development signing key. The APK and key are deliberately ignored by Git. Do not use that development key for an app-store or production release.
+The build produces `TTRPG-Control-Deck.apk` locally. By default, its first run creates a project-local development signing key. The APK and key are deliberately ignored by Git. Official tagged builds use the project's protected signing key so they remain upgrade-compatible.
 
-Install a locally built APK on an authorized Android device:
+Install a locally built APK on an authorized development device:
 
 ```bash
 adb install -r TTRPG-Control-Deck.apk
 ```
 
+End users should install the signed APK from [GitHub Releases](https://github.com/matt-bat/ttrpg-control-deck/releases/latest) by following [docs/INSTALL.md](docs/INSTALL.md), rather than creating a separate signing identity.
+
 ## Windows and VTT setup
 
 - [Windows wired-network setup](docs/WINDOWS-SETUP.md)
+- [Android installation and upgrades](docs/INSTALL.md)
 - [Foundry, Roll20, Discord, and PC control sets](docs/CONTROL-SETS.md)
 - [Optional upgrades](docs/OPTIONALS.md)
 

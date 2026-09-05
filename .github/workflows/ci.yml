@@ -26,3 +26,5 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Validate the 960x480 interface
         run: npm run test:ui
+      - name: Validate release metadata and install contract
+        run: npm run test:release
