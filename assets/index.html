@@ -12,11 +12,14 @@
     html,body { margin:0; height:100%; background:var(--bg); color:var(--ink); font:15px/1.3 system-ui,sans-serif; overflow:hidden; }
     button,input,textarea,select { font:inherit; }
     button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
-    header { height:48px; display:flex; align-items:center; padding:0 14px; background:#0d111a; border-bottom:1px solid var(--line); }
+    header { height:52px; display:flex; align-items:center; padding:0 10px; background:#0d111a; border-bottom:1px solid var(--line); }
     .brand { border:1px solid var(--line); border-radius:9px; padding:7px 9px; background:var(--panel2); font-weight:800; letter-spacing:.06em; color:var(--gold); margin-right:10px; white-space:nowrap; }
-    nav { display:flex; gap:5px; flex:1; height:100%; align-items:center; }
-    nav button { border:0; border-radius:9px; padding:7px 8px; color:var(--muted); background:transparent; font-weight:700; display:flex; align-items:center; gap:5px; }
-    nav button img { width:17px; height:17px; opacity:.72; filter:invert(82%); }
+    nav { display:flex; gap:4px; flex:1; height:100%; align-items:center; overflow:hidden; }
+    nav button { width:44px; height:44px; flex:0 0 44px; border:0; border-radius:11px; padding:0; color:var(--muted); background:transparent; font-weight:800; display:flex; align-items:center; justify-content:center; gap:6px; overflow:hidden; transition:width .16s ease,flex-basis .16s ease,background .16s ease; }
+    nav button img { width:25px; height:25px; flex:none; opacity:.78; filter:invert(82%); }
+    nav button .tool-label { display:block; flex:none; max-width:0; opacity:0; overflow:hidden; white-space:nowrap; transition:max-width .16s ease,opacity .12s ease; }
+    nav button.active { width:132px; flex-basis:132px; padding:0 10px; justify-content:flex-start; }
+    nav button.active .tool-label { max-width:92px; opacity:1; }
     nav button.active img { opacity:1; filter:brightness(0); }
     nav button.active { color:#111; background:var(--gold); }
     body[data-view="dm"] nav [data-role="player"],body[data-view="player"] nav [data-role="dm"] { display:none; }
@@ -25,7 +28,7 @@
     #networkDot.online { background:var(--green); box-shadow:0 0 6px var(--green); }
     #networkText { display:none; }
     #clock { font-variant-numeric:tabular-nums; }
-    main { height:calc(100% - 82px); padding:10px; overflow:auto; }
+    main { height:calc(100% - 86px); padding:10px; overflow:auto; }
     .page { display:none; height:100%; }
     .page.active { display:block; }
     .grid { display:grid; grid-template-columns:repeat(5,1fr); grid-auto-rows:82px; gap:8px; }
@@ -142,7 +145,7 @@
     .scene-layers { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:7px; }
     .scene-layers label { display:flex; align-items:center; gap:4px; padding:5px 7px; border-radius:8px; background:var(--panel2); }
     .scene-layers input { width:16px; height:16px; }
-    #viewPanel { position:fixed; top:54px; left:10px; z-index:16; display:none; width:270px; padding:10px; border:1px solid var(--blue); border-radius:13px; background:var(--panel); box-shadow:0 12px 35px #000b; }
+    #viewPanel { position:fixed; top:58px; left:10px; z-index:16; display:none; width:270px; padding:10px; border:1px solid var(--blue); border-radius:13px; background:var(--panel); box-shadow:0 12px 35px #000b; }
     #viewPanel.show { display:block; }
     .view-choice { width:100%; margin-top:7px; text-align:left; }
     .view-choice strong { display:block; color:var(--gold); }
@@ -165,21 +168,22 @@
     #sounds h2 { margin-bottom:5px; }
     #sounds .action { padding:7px 9px; }
     #campaignSelect,#campaignName,#gameSystem,#vttChoice { font-size:13px; }
-    @media (max-width:760px) { nav button { padding:7px 9px; } .grid { grid-template-columns:repeat(3,1fr); } }
+    @media (max-width:760px) { nav button.active { width:112px; flex-basis:112px; } .grid { grid-template-columns:repeat(3,1fr); } }
+    @media (prefers-reduced-motion:reduce) { nav button,nav button .tool-label { transition:none; } }
   </style>
 </head>
 <body data-view="dm">
   <header>
     <button id="viewSwitch" class="brand" aria-label="Switch DM or Player view">DM VIEW ▾</button>
     <nav>
-      <button data-page="home" data-role="dm" class="active"><img src="icons/vtt.svg" alt="">VTT</button>
-      <button data-page="player" data-role="player"><img src="icons/vtt.svg" alt="">Character</button>
-      <button data-page="dice"><img src="icons/dice.svg" alt="">Dice</button>
-      <button data-page="initiative" data-role="dm"><img src="icons/combat.svg" alt="">Combat</button>
-      <button data-page="reference"><img src="icons/library.svg" alt="">Library</button>
-      <button data-page="sounds"><img src="icons/audio.svg" alt="">Audio</button>
-      <button data-page="session" data-role="dm"><img src="icons/session.svg" alt="">Session</button>
-      <button data-page="setup"><img src="icons/setup.svg" alt="">Setup</button>
+      <button data-page="home" data-role="dm" class="active" aria-label="Open VTT tools"><img src="icons/vtt.svg" alt=""><span class="tool-label">VTT</span></button>
+      <button data-page="player" data-role="player" aria-label="Open character tools"><img src="icons/vtt.svg" alt=""><span class="tool-label">Character</span></button>
+      <button data-page="dice" aria-label="Open dice tools"><img src="icons/dice.svg" alt=""><span class="tool-label">Dice</span></button>
+      <button data-page="initiative" data-role="dm" aria-label="Open combat tools"><img src="icons/combat.svg" alt=""><span class="tool-label">Combat</span></button>
+      <button data-page="reference" aria-label="Open library tools"><img src="icons/library.svg" alt=""><span class="tool-label">Library</span></button>
+      <button data-page="sounds" aria-label="Open audio tools"><img src="icons/audio.svg" alt=""><span class="tool-label">Audio</span></button>
+      <button data-page="session" data-role="dm" aria-label="Open session tools"><img src="icons/session.svg" alt=""><span class="tool-label">Session</span></button>
+      <button data-page="setup" aria-label="Open setup tools"><img src="icons/setup.svg" alt=""><span class="tool-label">Setup</span></button>
     </nav>
     <div id="status"><span id="networkDot"></span><span id="networkText">Offline</span><span id="clock"></span></div>
   </header>
@@ -384,7 +388,8 @@
     let sceneMigration=false;Object.values(appState.campaigns).forEach(p=>{if(!Array.isArray(p.scenes)||!p.scenes.length){p.scenes=defaultScenes();p.activeScene=null;sceneMigration=true;}});if(!['dm','player'].includes(appState.viewMode)){appState.viewMode='dm';sceneMigration=true;}if(sceneMigration)persistApp();
     let toastTimer;function toast(message){$('#toast').textContent=message;$('#toast').classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),1800);}
     let activePage='home';
-    function showPage(id){const target=$('#'+id);if(!target||target.dataset.disabled==='true')id=appState.viewMode==='player'?'player':'home';activePage=id;$$('nav button,.page').forEach(x=>x.classList.remove('active'));const tab=$$('nav button').find(b=>b.dataset.page===id);if(tab)tab.classList.add('active');$('#'+id).classList.add('active');$('main').scrollTop=0;if($('#turnPanel'))$('#turnPanel').classList.remove('show');if($('#dicePanel'))$('#dicePanel').classList.remove('show');if($('#helpPanel'))$('#helpPanel').classList.remove('show');if($('#scenePanel'))$('#scenePanel').classList.remove('show');if($('#viewPanel'))$('#viewPanel').classList.remove('show');}
+    const pageRefreshers={};
+    function showPage(id){let target=$('#'+id);if(!target||target.dataset.disabled==='true'){id=appState.viewMode==='player'?'player':'home';target=$('#'+id);}activePage=id;$$('nav button,.page').forEach(x=>x.classList.remove('active'));$$('nav button').forEach(x=>x.removeAttribute('aria-current'));const tab=$$('nav button').find(b=>b.dataset.page===id);if(tab){tab.classList.add('active');tab.setAttribute('aria-current','page');}target.classList.add('active');$('main').scrollTop=0;target.querySelectorAll('.card').forEach(card=>card.scrollTop=0);if(pageRefreshers[id])pageRefreshers[id]();if($('#turnPanel'))$('#turnPanel').classList.remove('show');if($('#dicePanel'))$('#dicePanel').classList.remove('show');if($('#helpPanel'))$('#helpPanel').classList.remove('show');if($('#scenePanel'))$('#scenePanel').classList.remove('show');if($('#viewPanel'))$('#viewPanel').classList.remove('show');}
     $$('nav button').forEach(b=>b.onclick=()=>showPage(b.dataset.page));
     $$('[data-local-page]').forEach(b=>b.onclick=()=>showPage(b.dataset.localPage));
     $$('[data-url]').forEach(b=>b.onclick=()=>location.href=b.dataset.url);
@@ -405,6 +410,7 @@
       document.body.dataset.theme=p.theme||'gold';$('#stripCampaign').textContent=p.name||'Campaign';$('#stripCampaign').title=p.name||'Campaign';$('#sessionMode').value=p.mode||'prep';
     }
     applyLayout();
+    pageRefreshers.home=applyLayout;
     applyView();
     const sceneModes={prep:'Prep',exploration:'Explore',combat:'Combat',roleplay:'Roleplay',break:'Break',wrap:'Wrap-up'};
     const scenePages={home:'VTT',initiative:'Combat',sounds:'Audio',session:'Session',reference:'Library',dice:'Dice'};
@@ -423,16 +429,16 @@
     function openHelp(){const h=helpContent[activePage]||helpContent.home;$('#helpTitle').textContent=h[0];$('#helpText').textContent=h[1];$('#turnPanel').classList.remove('show');$('#dicePanel').classList.remove('show');$('#helpPanel').classList.add('show');}
     $('#helpButton').onclick=openHelp;$('#closeHelp').onclick=()=>$('#helpPanel').classList.remove('show');
 
-    let history=load('diceHistory',[]);
+    let history=load(stateKey('diceHistory'),appState.activeCampaign==='main'?load('diceHistory',[]):[]);
     const rnd=s=>Math.floor(Math.random()*s)+1;
-    function showRoll(total,label){ $('#result').innerHTML=total+'<small>'+label+'</small>';$('#stripDice').textContent=total;$('#quickDiceResult').textContent=total;history.unshift(total+'  '+label); history=history.slice(0,12); save('diceHistory',history); renderHistory(); }
+    function showRoll(total,label){ $('#result').innerHTML=total+'<small>'+label+'</small>';$('#stripDice').textContent=total;$('#quickDiceResult').textContent=total;history.unshift(total+'  '+label); history=history.slice(0,12); save(stateKey('diceHistory'),history); renderHistory(); }
     function renderHistory(){ $('#history').textContent=history.join('   •   '); }
-    renderHistory();
+    renderHistory();pageRefreshers.dice=renderHistory;
     $$('.die').forEach(b=>b.onclick=()=>{ if(b.dataset.special){ showRoll(Math.random()<.5?'Heads':'Tails','coin'); return; } const s=+b.dataset.die,m=+$('#modifier').value||0,r=rnd(s); showRoll(r+m,'d'+s+(m?((m>0?'+':'')+m):'')+' ['+r+']'); });
     $('#adv').onclick=()=>{ const a=rnd(20),b=rnd(20),m=+$('#modifier').value||0; showRoll(Math.max(a,b)+m,'adv ['+a+', '+b+']'); };
     $('#dis').onclick=()=>{ const a=rnd(20),b=rnd(20),m=+$('#modifier').value||0; showRoll(Math.min(a,b)+m,'dis ['+a+', '+b+']'); };
     $('#rollFormula').onclick=()=>{ const raw=$('#formula').value.trim().replace(/\s/g,''); const m=raw.match(/^(\d{1,2})d(\d{1,3})([+-]\d{1,3})?$/i); if(!m){ showRoll('?', 'use 2d6+3'); return; } const n=Math.min(+m[1],50),s=Math.min(+m[2],1000),mod=+(m[3]||0),rolls=[]; for(let i=0;i<n;i++) rolls.push(rnd(s)); showRoll(rolls.reduce((a,b)=>a+b,0)+mod,raw+' ['+rolls.join(',')+']'); };
-    $('#clearHistory').onclick=()=>{ history=[]; save('diceHistory',history); renderHistory(); $('#result').textContent='—'; };
+    $('#clearHistory').onclick=()=>{ history=[]; save(stateKey('diceHistory'),history); renderHistory(); $('#result').textContent='—'; };
     let quickMod=+$('#modifier').value||0,lastQuickRoll=null;
     function renderQuickMod(){$('#quickModifier').textContent=(quickMod>=0?'+':'')+quickMod;$('#modifier').value=quickMod;}$('#modifier').oninput=()=>{quickMod=+$('#modifier').value||0;$('#quickModifier').textContent=(quickMod>=0?'+':'')+quickMod;};
     function quickDie(s){const run=()=>{const r=rnd(s);showRoll(r+quickMod,'d'+s+(quickMod?(quickMod>0?'+':'')+quickMod:'')+' ['+r+']');};lastQuickRoll=run;run();}
@@ -461,7 +467,7 @@
     $('#quickNext').onclick=()=>moveTurn(1);$('#quickPrev').onclick=()=>moveTurn(-1);
     $('#quickHpDown').onclick=()=>{const e=currentCombatant();if(e){e.hp=Math.max(0,e.hp-1);saveCombat();}};$('#quickHpUp').onclick=()=>{const e=currentCombatant();if(e){e.hp++;saveCombat();}};
     $('#openCombat').onclick=()=>{$('#turnPanel').classList.remove('show');showPage(appState.viewMode==='player'?'player':'initiative');};
-    renderInit();
+    renderInit();pageRefreshers.initiative=renderInit;
 
     const emptyPlayer={name:'',characterClass:'',hp:0,maxHp:0,ac:10,speed:25,level:1,resource:0,notes:'',attack:0,check:0,save:0,initiative:0,conditions:[]};
     let playerState={...emptyPlayer,...load(stateKey('player'),emptyPlayer)};playerState.conditions=Array.isArray(playerState.conditions)?playerState.conditions:[];
@@ -474,7 +480,7 @@
     [['playerAc','ac'],['playerSpeed','speed'],['playerLevel','level'],['playerAttack','attack'],['playerCheck','check'],['playerSave','save'],['playerInitiative','initiative']].forEach(([id,key])=>$('#'+id).onchange=()=>{playerState[key]=+$('#'+id).value||0;savePlayer();});
     $$('[data-player-hp]').forEach(b=>b.onclick=()=>{playerState.hp=Math.max(0,Math.min(playerState.maxHp||0,playerState.hp+(+b.dataset.playerHp)));savePlayer();});$$('[data-player-resource]').forEach(b=>b.onclick=()=>{playerState.resource=Math.max(0,Math.min(3,playerState.resource+(+b.dataset.playerResource)));savePlayer();});
     $$('[data-player-roll]').forEach(b=>b.onclick=()=>{const key=b.dataset.playerRoll,mod=+playerState[key]||0,roll=rnd(20);showRoll(roll+mod,key[0].toUpperCase()+key.slice(1)+' d20 '+(mod>=0?'+':'')+mod+' ['+roll+']');toast(key[0].toUpperCase()+key.slice(1)+' rolled');});
-    $$('[data-player-condition]').forEach(b=>b.onclick=()=>{const name=b.dataset.playerCondition,i=playerState.conditions.indexOf(name);if(i>=0)playerState.conditions.splice(i,1);else playerState.conditions.push(name);savePlayer();});renderPlayer();
+    $$('[data-player-condition]').forEach(b=>b.onclick=()=>{const name=b.dataset.playerCondition,i=playerState.conditions.indexOf(name);if(i>=0)playerState.conditions.splice(i,1);else playerState.conditions.push(name);savePlayer();});renderPlayer();pageRefreshers.player=()=>{renderPlayer();renderTurnControl();};
 
     const conditions=['Blinded','Charmed','Confused','Dazed','Deafened','Doomed','Drained','Dying','Encumbered','Enfeebled','Fascinated','Fatigued','Flat-Footed','Fleeing','Frightened','Grabbed','Hidden','Immobilized','Invisible','Paralyzed','Persistent Damage','Petrified','Poisoned','Prone','Quickened','Restrained','Sickened','Slowed','Stunned','Unconscious','Wounded'];
     $('#conditionChips').innerHTML=conditions.map(x=>'<span class="chip">'+x+'</span>').join('');
@@ -482,7 +488,7 @@
     $('#searchDnd').onclick=()=>{const q=$('#libraryQuery').value.trim();location.href=q?'https://www.dndbeyond.com/search?q='+encodeURIComponent(q):'https://www.dndbeyond.com/';};
 
     const srdBase='https://www.dnd5eapi.co';
-    let srdItems=[],currentSrd=null,srdCache=load('srdCache',{}),srdFavorites=load('srdFavorites',[]);
+    let srdItems=[],currentSrd=null,srdCache=load('srdCache',{}),srdFavorites=load(stateKey('srdFavorites'),appState.activeCampaign==='main'?load('srdFavorites',[]):[]);
     function srdSummary(d){
       const bits=[];
       if(d.size||d.type||d.alignment)bits.push([d.size,d.type,d.alignment].filter(Boolean).join(' • '));
@@ -497,13 +503,13 @@
       const abilities=d.strength!=null?'<div class="hint">STR '+d.strength+' · DEX '+d.dexterity+' · CON '+d.constitution+' · INT '+d.intelligence+' · WIS '+d.wisdom+' · CHA '+d.charisma+'</div>':'';
       return '<h3>'+escapeHtml(d.name||'SRD result')+'</h3>'+(bits.length?'<b>'+escapeHtml(bits.join(' · '))+'</b><br>':'')+abilities+escapeHtml(desc||'Open-rule entry loaded.');
     }
-    function renderSrdDetail(d,offline=false){currentSrd=d;const url=d.url||('/api/2014/'+($('#srdType').value||'monsters')+'/'+d.index);const favorite=srdFavorites.some(x=>x.url===url);$('#srdDetail').innerHTML=srdSummary(d)+'<div class="inline" style="margin-top:7px"><button class="action '+(favorite?'favorite':'')+'" id="favoriteSrd">'+(favorite?'★ Saved':'☆ Favourite')+'</button>'+(d.hit_points!=null?'<button class="action green" id="addSrdCombat">Add to combat</button>':'')+(offline?'<span class="hint">Offline cache</span>':'')+'</div>';$('#favoriteSrd').onclick=()=>{const i=srdFavorites.findIndex(x=>x.url===url);if(i>=0){srdFavorites.splice(i,1);toast('Removed from favourites');}else{srdFavorites.unshift({name:d.name,url});toast('Saved to favourites');}save('srdFavorites',srdFavorites);renderSrdDetail(d,offline);};if($('#addSrdCombat'))$('#addSrdCombat').onclick=()=>{const dex=Math.floor(((d.dexterity||10)-10)/2);addInit(d.name,rnd(20)+dex,d.hit_points);showPage('initiative');};save('lastSrd',{data:d});}
+    function renderSrdDetail(d,offline=false){currentSrd=d;const url=d.url||('/api/2014/'+($('#srdType').value||'monsters')+'/'+d.index);const favorite=srdFavorites.some(x=>x.url===url);$('#srdDetail').innerHTML=srdSummary(d)+'<div class="inline" style="margin-top:7px"><button class="action '+(favorite?'favorite':'')+'" id="favoriteSrd">'+(favorite?'★ Saved':'☆ Favourite')+'</button>'+(d.hit_points!=null?'<button class="action green" id="addSrdCombat">Add to combat</button>':'')+(offline?'<span class="hint">Offline cache</span>':'')+'</div>';$('#favoriteSrd').onclick=()=>{const i=srdFavorites.findIndex(x=>x.url===url);if(i>=0){srdFavorites.splice(i,1);toast('Removed from favourites');}else{srdFavorites.unshift({name:d.name,url});toast('Saved to favourites');}save(stateKey('srdFavorites'),srdFavorites);renderSrdDetail(d,offline);};if($('#addSrdCombat'))$('#addSrdCombat').onclick=()=>{const dex=Math.floor(((d.dexterity||10)-10)/2);addInit(d.name,rnd(20)+dex,d.hit_points);showPage('initiative');};save(stateKey('lastSrd'),{data:d});}
     function cacheSrd(url,d){srdCache[url]=d;const keys=Object.keys(srdCache);if(keys.length>30)delete srdCache[keys[0]];save('srdCache',srdCache);}
     async function openSrd(url){$('#srdDetail').innerHTML='<span class="hint">Loading entry…</span>';try{const r=await fetch(srdBase+url);if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();cacheSrd(url,d);renderSrdDetail(d);}catch(e){if(srdCache[url])renderSrdDetail(srdCache[url],true);else $('#srdDetail').innerHTML='<span class="danger">Could not load this entry. Check Wi-Fi and try again.</span>';}}
     function renderSrd(items){srdItems=items.slice(0,24);$('#srdResults').innerHTML=srdItems.length?srdItems.map((x,i)=>'<button class="chip" data-srd="'+i+'">'+(srdFavorites.some(f=>f.url===x.url)?'★ ':'')+escapeHtml(x.name)+'</button>').join(''):'<span class="hint">No matching SRD entries.</span>';$$('[data-srd]').forEach(b=>b.onclick=()=>openSrd(srdItems[+b.dataset.srd].url));}
     async function searchSrd(){const type=$('#srdType').value,q=$('#srdQuery').value.trim().toLowerCase();if(!q&&srdFavorites.length){renderSrd(srdFavorites);return;}$('#srdResults').innerHTML='<span class="hint">Searching open rules…</span>';try{let url='/api/2014/'+type;if(q&&(type==='monsters'||type==='spells'))url+='?name='+encodeURIComponent(q);const r=await fetch(srdBase+url);if(!r.ok)throw Error('HTTP '+r.status);const d=await r.json();let items=d.results||[];if(q&&type!=='monsters'&&type!=='spells')items=items.filter(x=>x.name.toLowerCase().includes(q));renderSrd(items);}catch(e){if(!q&&srdFavorites.length)renderSrd(srdFavorites);else $('#srdResults').innerHTML='<span class="danger">SRD service unavailable. Cached favourites still work.</span>';}}
     $('#searchSrd').onclick=searchSrd;$('#srdQuery').onkeydown=e=>{if(e.key==='Enter')searchSrd();};
-    const lastSrd=load('lastSrd',null);if(lastSrd&&lastSrd.data)renderSrdDetail(lastSrd.data,true);if(srdFavorites.length)renderSrd(srdFavorites);
+    const lastSrd=load(stateKey('lastSrd'),appState.activeCampaign==='main'?load('lastSrd',null):null);if(lastSrd&&lastSrd.data)renderSrdDetail(lastSrd.data,true);if(srdFavorites.length)renderSrd(srdFavorites);pageRefreshers.reference=()=>{if(currentSrd)renderSrdDetail(currentSrd,true);if(srdItems.length)renderSrd(srdItems);else if(srdFavorites.length)renderSrd(srdFavorites);};
 
     let audioCtx=null,activeAudio=[];
     function ac(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();return audioCtx;}
@@ -530,7 +536,7 @@
     $$('[data-ambient-preset]').forEach(b=>b.onclick=()=>{clearActiveScene();ambientState.layers=[b.dataset.ambientPreset];syncAmbient();showPage('sounds');toast('Background ambience started');});
     $('#ambientVolume').oninput=()=>{ambientState.volume=+$('#ambientVolume').value;renderAmbient();};$('#ambientVolume').onchange=syncAmbient;
     function stopAmbient(){clearActiveScene();ambientState.layers=[];profile().ambience=ambientState;persistApp();if(window.GMDeck&&GMDeck.stopAmbient)GMDeck.stopAmbient();renderAmbient();toast('Background ambience stopped');}
-    $('#stopAmbient').onclick=stopAmbient;$('#stripStop').onclick=()=>{$('#stopSounds').click();stopAmbient();};renderAmbient();if(ambientState.layers.length)syncAmbient();
+    $('#stopAmbient').onclick=stopAmbient;$('#stripStop').onclick=()=>{$('#stopSounds').click();stopAmbient();};renderAmbient();pageRefreshers.sounds=renderAmbient;if(ambientState.layers.length)syncAmbient();
 
     const checkLabels=['Foundry / Roll20 world and scene ready','Maps, lighting and tokens checked','Character sheets and HP reviewed','Handouts / encounters queued','Voice chat and audio tested','Break reminder planned'];
     const emptySession={checks:{},notes:'',hero:0,party:0};
@@ -553,7 +559,7 @@
     $$('[data-minutes]').forEach(b=>b.onclick=()=>{clearActiveScene();timerEnd=Date.now()+(+b.dataset.minutes)*60000;save(stateKey('timerEnd'),timerEnd);renderTimer();toast(b.dataset.minutes+' minute clock started');});
     $('#stopTimer').onclick=()=>{clearActiveScene();timerEnd=0;save(stateKey('timerEnd'),0);renderTimer();};timerHandle=setInterval(renderTimer,1000);renderTimer();
     $$('[data-safety]').forEach(b=>b.onclick=()=>{$('#safetyState').textContent=b.dataset.safety;session.safety=b.dataset.safety;save(stateKey('session'),session);toast(b.dataset.safety);});
-    if(session.safety)$('#safetyState').textContent=session.safety;
+    if(session.safety)$('#safetyState').textContent=session.safety;pageRefreshers.session=()=>{$$('[data-check]').forEach(c=>c.checked=!!session.checks[c.dataset.check]);$('#notes').value=session.notes||'';$('#hero').textContent=session.hero||0;$('#party').textContent=session.party||0;$('#safetyState').textContent=session.safety||'Ready';renderTimer();};
     $('#resetSession').onclick=()=>{if(confirm('Reset this campaign session, notes, counters and initiative?')){session={...emptySession};combat={...emptyCombat};save(stateKey('session'),session);save(stateKey('combat'),combat);location.reload();}};
     function normalizeUrl(v){v=v.trim();if(v&&!/^https?:\/\//i.test(v))v='http://'+v;return v;}
     function renderProfileForm(){const p=profile();$('#campaignSelect').innerHTML=Object.entries(appState.campaigns).map(([id,c])=>'<option value="'+escapeHtml(id)+'">'+escapeHtml(c.name)+'</option>').join('');$('#campaignSelect').value=appState.activeCampaign;$('#campaignName').value=p.name||'';$('#gameSystem').value=p.system||'both';$('#vttChoice').value=p.vtt||'both';$('#foundryUrl').value=(p.links&&p.links.foundry)||'';$('#roll20Url').value=(p.links&&p.links.roll20)||'';$('#theme').value=p.theme||'gold';}
@@ -569,6 +575,7 @@
     $('#tileToggles').innerHTML=Object.entries(tileNames).map(([k,label])=>'<label><input type="checkbox" data-tile-toggle="'+k+'">'+label+'</label>').join('');
     $$('[data-module-toggle]').forEach(c=>{c.checked=profile().modules[c.dataset.moduleToggle]!==false;c.onchange=()=>{profile().modules[c.dataset.moduleToggle]=c.checked;persistApp();applyLayout();toast(c.checked?'Module enabled':'Module hidden');};});
     $$('[data-tile-toggle]').forEach(c=>{c.checked=!profile().hiddenTiles.includes(c.dataset.tileToggle);c.onchange=()=>{const hidden=profile().hiddenTiles,k=c.dataset.tileToggle,i=hidden.indexOf(k);if(c.checked&&i>=0)hidden.splice(i,1);if(!c.checked&&i<0)hidden.push(k);persistApp();applyLayout();};});
+    pageRefreshers.setup=()=>{renderProfileForm();$$('[data-module-toggle]').forEach(c=>c.checked=profile().modules[c.dataset.moduleToggle]!==false);$$('[data-tile-toggle]').forEach(c=>c.checked=!profile().hiddenTiles.includes(c.dataset.tileToggle));};
     $('#exportConfig').onclick=()=>{const storage={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);storage[k]=localStorage.getItem(k);}$('#configBox').value=JSON.stringify({format:'gmdeck-backup-1',created:new Date().toISOString(),storage});$('#configBox').select();toast('Backup generated—copy this text');};
     $('#importConfig').onclick=()=>{try{const data=JSON.parse($('#configBox').value);if(data.format!=='gmdeck-backup-1'||!data.storage)throw Error('format');if(!confirm('Replace TTRPG Control Deck configuration with this backup?'))return;Object.entries(data.storage).forEach(([k,v])=>localStorage.setItem(k,v));location.reload();}catch(e){toast('Backup text is not valid');}};
     renderProfileForm();

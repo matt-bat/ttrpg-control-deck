@@ -6,6 +6,9 @@ All notable changes to TTRPG Control Deck are recorded here.
 
 - Renamed the public product, repository, APK, screenshots, and setup package from GM Deck to TTRPG Control Deck.
 - Preserved the existing Android package, deep-link scheme, storage keys, and backup format for compatibility.
+- Refreshed tool views when navigating and isolated dice and saved-library state by campaign.
+- Enlarged the header tools into touch-sized icons with an expanded active tool.
+- Restored normal Android Home-button behavior by keeping the deck as a regular launcher app instead of a replacement Home app.
 
 ## 3.1.0 — 2026-08-31
 

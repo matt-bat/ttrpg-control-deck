@@ -25,8 +25,10 @@ An offline-first tabletop companion that turns a small Android display into a fo
 
 TTRPG Control Deck 3.1.0 is designed around the 960×480 Echo Show 5 viewport while remaining usable in a normal Android WebView. Its major features are:
 
+- Runs as a regular Android app, so the device Home button returns to the tablet launcher.
 - DM and Player interfaces switchable in two taps.
-- Campaign profiles for Foundry VTT, Roll20, D&D 5e, Pathfinder 2e, or mixed tables.
+- Campaign profiles for Foundry VTT, Roll20, D&D 5e, Pathfinder 2e, or mixed tables, with campaign-isolated character, combat, session, dice, and saved-library state.
+- A compact, touch-sized tool dock whose selected icon expands in place and opens a fully usable tool view without leaving the app.
 - Editable Scene Director presets combining mode, destination, background ambience, and timer.
 - Persistent character HP, resources, roll modifiers, conditions, notes, and turn status.
 - Fast d4–d100 rolling, formulas, modifiers, advantage, disadvantage, history, and repeat roll.
@@ -59,7 +61,7 @@ npx playwright install chromium
 npm run test:ui
 ```
 
-The test opens the app at exactly 960×480, checks DM/Player switching, Player persistence and dice, Scene Director apply/edit/clear behavior, persistent control-strip bounds, and browser errors. It writes four current screenshots to `screenshots/`.
+The test opens the app at exactly 960×480 and checks the expanding touch tool dock, screen redraws, campaign state isolation, DM/Player switching, Player persistence and dice, Scene Director apply/edit/clear behavior, persistent control-strip bounds, and browser errors. It writes four current screenshots to `screenshots/`.
 
 Build the Android APK on a compatible Debian/Ubuntu Android SDK environment:
 

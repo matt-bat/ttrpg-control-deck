@@ -13,6 +13,7 @@ if (process.env.GMDECK_CHROMIUM) launchOptions.executablePath = process.env.GMDE
 const browser = await chromium.launch(launchOptions);
 const context = await browser.newContext({ viewport: { width: 960, height: 480 }, deviceScaleFactor: 1 });
 const page = await context.newPage();
+await page.emulateMedia({ reducedMotion: 'reduce' });
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 await page.goto(pathToFileURL(path.join(root, 'assets', 'index.html')).href);
@@ -56,6 +57,16 @@ const assertChromeFits = async label => {
 
 await click('#welcomeDone');
 await assertChromeFits('DM view');
+const toolDock = await page.evaluate(() => {
+  const active = document.querySelector('nav button.active').getBoundingClientRect();
+  const compact = document.querySelector('nav button[data-page="dice"]').getBoundingClientRect();
+  const icon = document.querySelector('nav button[data-page="dice"] img').getBoundingClientRect();
+  return { activeWidth: active.width, compactWidth: compact.width, compactHeight: compact.height, iconWidth: icon.width };
+});
+check(toolDock.compactWidth >= 44 && toolDock.compactHeight >= 44, 'Compact tool buttons must remain usable touch targets');
+check(toolDock.iconWidth >= 24, 'Compact tool icons are too small for the target display');
+check(toolDock.activeWidth > toolDock.compactWidth, 'The selected tool did not expand in place');
+check(await page.locator('nav button.active').getAttribute('aria-current') === 'page', 'Selected tool is not exposed to assistive technology');
 await page.screenshot({ path: path.join(screenshotDir, 'ttrpg-control-deck-3.1-dm-view.png') });
 
 await click('#viewSwitch');
@@ -64,6 +75,8 @@ await page.screenshot({ path: path.join(screenshotDir, 'ttrpg-control-deck-3.1-r
 await click('[data-view-choice="player"]');
 check(await page.locator('#player').isVisible(), 'Player view did not open on the second tap');
 check(await page.locator('body').getAttribute('data-view') === 'player', 'Player role was not applied');
+const activeToolLabelFits = await page.locator('nav button.active .tool-label').evaluate(element => element.scrollWidth <= element.clientWidth);
+check(activeToolLabelFits, 'Expanded tool label is clipped');
 check(await page.locator('.player-condition').count() === 8, 'Player view must expose eight quick conditions');
 check(await page.locator('[data-role="dm"]:visible').count() === 0, 'DM-only navigation remained visible in Player view');
 check(!await page.locator('#sceneControl').isVisible() && !await page.locator('#sessionMode').isVisible(), 'DM-only footer controls remained visible in Player view');
@@ -79,6 +92,10 @@ await click('[data-player-roll="attack"]');
 const playerState = await page.evaluate(() => JSON.parse(localStorage.getItem('player:main')));
 check(playerState.name === 'Valeros' && playerState.maxHp === 30 && playerState.hp === 29 && playerState.attack === 7, 'Player state did not persist per campaign');
 check(/^\d+$/.test(await page.locator('#stripDice').textContent()), 'Player quick roll did not update the persistent dice result');
+await click('[data-page="dice"]');
+await page.locator('#playerName').evaluate(element => { element.value = 'Stale screen value'; });
+await click('[data-page="player"]');
+check(await page.locator('#playerName').inputValue() === 'Valeros', 'Revisiting a screen did not refresh it from canonical state');
 await page.screenshot({ path: path.join(screenshotDir, 'ttrpg-control-deck-3.1-player-view.png') });
 
 await click('#viewSwitch');
@@ -110,11 +127,39 @@ await page.locator('#sessionMode').dispatchEvent('change');
 const activeScene = await page.evaluate(() => JSON.parse(localStorage.getItem('appState')).campaigns.main.activeScene);
 check(activeScene === null, 'Manual mode change did not clear the active scene');
 
+await page.evaluate(() => {
+  appState.campaigns.second = JSON.parse(JSON.stringify(appState.campaigns.main));
+  appState.campaigns.second.name = 'Second Campaign';
+  persistApp();
+  localStorage.setItem('diceHistory:main', JSON.stringify(['MAIN ONLY']));
+  localStorage.setItem('diceHistory:second', JSON.stringify(['SECOND ONLY']));
+  localStorage.setItem('srdFavorites:main', JSON.stringify([{ name: 'Main Entry', url: '/main-entry' }]));
+  localStorage.setItem('srdFavorites:second', JSON.stringify([{ name: 'Second Entry', url: '/second-entry' }]));
+  localStorage.setItem('lastSrd:main', JSON.stringify({ data: { name: 'Main Entry', index: 'main-entry', url: '/main-entry', desc: ['Main campaign detail'] } }));
+  localStorage.setItem('lastSrd:second', JSON.stringify({ data: { name: 'Second Entry', index: 'second-entry', url: '/second-entry', desc: ['Second campaign detail'] } }));
+});
+await click('[data-page="setup"]');
+await Promise.all([
+  page.waitForEvent('load'),
+  page.locator('#campaignSelect').selectOption('second')
+]);
+check((await page.locator('#stripCampaign').textContent()).trim() === 'Second Campaign', 'Campaign selection did not refresh the active profile');
+await click('[data-page="dice"]');
+check((await page.locator('#history').textContent()).includes('SECOND ONLY'), 'Selected campaign dice history did not load');
+check(!(await page.locator('#history').textContent()).includes('MAIN ONLY'), 'Dice history leaked between campaigns');
+await click('[data-page="reference"]');
+check((await page.locator('#srdDetail').textContent()).includes('Second Entry'), 'Selected campaign library detail did not load');
+check(!(await page.locator('#srdDetail').textContent()).includes('Main Entry'), 'Library detail leaked between campaigns');
+check((await page.locator('#srdResults').textContent()).includes('Second Entry'), 'Selected campaign favourites did not load');
+
 check(errors.length === 0, `Browser errors: ${errors.join('; ')}`);
 console.log(JSON.stringify({
   viewport: '960x480',
   roleSwitchTaps: 2,
   playerPersistence: 'passed',
+  screenRefresh: 'passed',
+  campaignIsolation: 'passed',
+  expandableToolDock: 'passed',
   playerDice: 'passed',
   sceneApplyEditAndClear: 'passed',
   screenshots: 4,
